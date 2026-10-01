@@ -1,0 +1,35 @@
+# Rebuilt inside the image
+node_modules
+vendor
+public/build
+public/hot
+public/storage
+bootstrap/ssr
+bootstrap/cache/*.php
+resources/js/actions
+resources/js/routes
+resources/js/wayfinder
+
+# Local environment and runtime data
+.env
+.env.*
+database/*.sqlite*
+storage/*.key
+storage/app/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/testing/*
+storage/framework/views/*
+storage/logs/*
+storage/pail
+
+# Not needed in the image
+.git
+.github
+.idea
+.vscode
+.claude
+.phpunit.cache
+k8s
+tests
+*.md

@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client-portal-v2
+  namespace: client-portal
+  labels:
+    app.kubernetes.io/name: client-portal-v2
+    app.kubernetes.io/part-of: client-portal
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: client-portal-v2
+      app.kubernetes.io/part-of: client-portal
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: client-portal-v2
+        app.kubernetes.io/part-of: client-portal
+    spec:
+      initContainers:
+        # Bring the schema up to date before the new version takes traffic.
+        - name: migrate
+          image: ghcr.io/skill-wanderer/client-portal-v2:0.1.0
+          imagePullPolicy: IfNotPresent
+          command: ["php", "artisan", "migrate", "--force"]
+          envFrom:
+            - configMapRef:
+                name: client-portal-v2-config
+            - secretRef:
+                name: client-portal-v2-secret
+      containers:
+        - name: client-portal-v2
+          image: ghcr.io/skill-wanderer/client-portal-v2:0.1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: client-portal-v2-config
+            - secretRef:
+                name: client-portal-v2-secret
+          readinessProbe:
+            httpGet:
+              path: /up
+              port: http
+          livenessProbe:
+            httpGet:
+              path: /up
+              port: http
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
